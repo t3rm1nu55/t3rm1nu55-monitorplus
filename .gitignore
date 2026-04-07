@@ -1,0 +1,26 @@
+# Build artifacts
+/target
+**/target/
+**/*.rs.bk
+*.pdb
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Env files (safety — shouldn't exist but just in case)
+.env
+.env.local
+*.key
+*.pem
+
+# Local dev scratch
+/scratch
+/tmp
+/.claude/local

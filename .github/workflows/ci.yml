@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  build:
+    name: ${{ matrix.variant }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Variant A — personal build, full capability.
+          # tier3 transitively enables tier2 + __es + tier1 + __kperf. research depends on tier2.
+          - variant: a-personal
+            features: "tier3,research"
+          # Variant B — signed Homebrew tap (planned). Drops Endpoint Security.
+          - variant: b-pro
+            features: "tier2,research"
+          # Variant C — anonymous Homebrew formula (planned).
+          # Drops kperf PMU + per-process power inference + macOS-PSI.
+          - variant: c-public
+            features: "tier1"
+
+    # Route matrix values through env vars rather than inlining ${{ }} into run: blocks.
+    # This is the command-injection-safe pattern even though our matrix values come from
+    # this file (not user input); it's also easier to read.
+    env:
+      VARIANT: ${{ matrix.variant }}
+      FEATURES: ${{ matrix.features }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.variant }}
+
+      - name: cargo fmt
+        run: cargo fmt --all -- --check
+
+      - name: cargo clippy
+        run: |
+          set -euo pipefail
+          for pkg in t3rm-core t3rm-tsdb t3rm-mcp t3rm-tui t3rm-exporter t3rm-pmud; do
+            echo "::group::clippy $pkg (variant $VARIANT)"
+            cargo clippy -p "$pkg" --no-default-features --features "$FEATURES" -- -D warnings
+            echo "::endgroup::"
+          done
+
+      - name: cargo build
+        run: |
+          set -euo pipefail
+          for pkg in t3rm-core t3rm-tsdb t3rm-mcp t3rm-tui t3rm-exporter t3rm-pmud; do
+            echo "::group::build $pkg (variant $VARIANT)"
+            cargo build -p "$pkg" --no-default-features --features "$FEATURES"
+            echo "::endgroup::"
+          done
+
+      - name: cargo test
+        run: |
+          set -euo pipefail
+          for pkg in t3rm-core t3rm-tsdb; do
+            echo "::group::test $pkg (variant $VARIANT)"
+            cargo test -p "$pkg" --no-default-features --features "$FEATURES"
+            echo "::endgroup::"
+          done

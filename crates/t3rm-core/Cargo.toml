@@ -1,0 +1,32 @@
+[package]
+name = "t3rm-core"
+description = "Collector library for t3rm1nu55-monitorplus: channel discovery, source traits, privilege tiers"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[features]
+default = ["tier1"]
+
+# Public tier features — the CI matrix uses these to pick release variants.
+tier1 = []
+tier2 = ["tier1", "__kperf"]
+tier3 = ["tier2", "__es"]
+
+# Research track features (per-process power inference, macOS-PSI, histogram compression).
+# Requires tier2 because the inference layer consumes kperf PMU counters.
+research = ["tier2"]
+
+# Private features (implementation detail) — gate specific modules.
+# Do not enable these directly; use the public tier features above.
+__kperf = []
+__es = []
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+serde.workspace = true

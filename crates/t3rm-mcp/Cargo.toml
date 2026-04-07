@@ -1,0 +1,28 @@
+[package]
+name = "t3rm-mcp"
+description = "MCP server for t3rm1nu55-monitorplus — exposes system metrics to LLM agents"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "t3rm-mcp"
+path = "src/main.rs"
+
+[features]
+default = ["tier1"]
+tier1 = ["t3rm-core/tier1"]
+tier2 = ["t3rm-core/tier2"]
+tier3 = ["t3rm-core/tier3"]
+research = ["t3rm-core/research"]
+
+[dependencies]
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tokio.workspace = true
+t3rm-core = { path = "../t3rm-core", default-features = false }
+t3rm-tsdb = { path = "../t3rm-tsdb" }

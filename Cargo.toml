@@ -1,0 +1,39 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/t3rm-core",
+    "crates/t3rm-tsdb",
+    "crates/t3rm-pmud",
+    "crates/t3rm-mcp",
+    "crates/t3rm-tui",
+    "crates/t3rm-exporter",
+]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.91"
+authors = ["Mark Forster"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/t3rm1nu55/t3rm1nu55-monitorplus"
+readme = "README.md"
+categories = ["command-line-utilities", "os::macos-apis"]
+keywords = ["macos", "apple-silicon", "monitoring", "observability", "mcp"]
+
+[workspace.dependencies]
+anyhow = "1"
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+serde = { version = "1", features = ["derive"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "debuginfo"
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = 1

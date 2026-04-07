@@ -1,0 +1,27 @@
+[package]
+name = "t3rm-pmud"
+description = "Privileged kperf sidecar for t3rm1nu55-monitorplus (root-only, opt-in)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "t3rm-pmud"
+path = "src/main.rs"
+# Sprint 3 will add: required-features = ["tier2"]
+
+[features]
+default = ["tier1"]
+tier1 = ["t3rm-core/tier1"]
+tier2 = ["t3rm-core/tier2"]
+tier3 = ["t3rm-core/tier3"]
+research = ["t3rm-core/research"]
+
+[dependencies]
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+t3rm-core = { path = "../t3rm-core", default-features = false }

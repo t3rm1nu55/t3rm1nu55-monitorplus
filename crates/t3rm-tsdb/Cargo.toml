@@ -1,0 +1,23 @@
+[package]
+name = "t3rm-tsdb"
+description = "Embedded TSDB for t3rm1nu55-monitorplus: Gorilla compression on redb + Last Value Cache"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[features]
+# No-op tier features so the CI matrix can pass uniform feature sets to every crate.
+default = []
+tier1 = []
+tier2 = []
+tier3 = []
+research = []
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+# redb, serde added in Sprint 2 when the real TSDB lands
