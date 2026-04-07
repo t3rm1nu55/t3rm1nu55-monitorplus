@@ -4,7 +4,7 @@
 > See `CLAUDE.md` for stable architecture and design rules.
 
 **Last updated:** 2026-04-07
-**Current sprint:** Sprint 0 — Scaffold (executing)
+**Current sprint:** Sprint 0 — Scaffold ✅ complete (1 follow-up pending) → Sprint 1 next
 
 ---
 
@@ -20,14 +20,14 @@
 - [x] **S0-4.** Scaffold 6 crate skeletons in `crates/` (compile clean, stub APIs only) — 2026-04-07
 - [x] **S0-5.** Define Cargo features on `t3rm-core`: `tier1`, `tier2`, `tier3`, `research`, plus private `__kperf`/`__es` gates — 2026-04-07
 - [x] **S0-6.** `.github/workflows/ci.yml` with three-variant build matrix (a-personal, b-pro, c-public) — 2026-04-07
-- [ ] **S0-7.** Local `cargo check` to verify workspace compiles clean across all three variants
-- [ ] **S0-8.** `git init`, initial commit (conventional commit message)
-- [ ] **S0-9.** `gh repo create t3rm1nu55-monitorplus --public --source=. --push`
-- [ ] **S0-10.** Verify CI green on first push (all 3 variants build)
-- [ ] **S0-11.** Create `t3rm1nu55-ane-research` repo with journal/references/structure
-- [ ] **S0-12.** Seed `references.md` from the research synthesis (Sonnet agent output)
-- [ ] **S0-13.** Set up daily RemoteTrigger Sonnet agent for research stream
-- [ ] **S0-14.** Verify RemoteTrigger fires once and updates the journal correctly
+- [x] **S0-7.** Local `cargo check` verified — all three variants compile clean, zero warnings, zero clippy complaints, cargo fmt clean — 2026-04-07
+- [x] **S0-8.** `git init` + conventional-commit initial commit (29 files, 1557 insertions) — 2026-04-07, commit `42ee438`
+- [x] **S0-9.** `gh repo create t3rm1nu55-monitorplus --public --source=. --push` → https://github.com/t3rm1nu55/t3rm1nu55-monitorplus — 2026-04-07
+- [x] **S0-10.** CI verified green on first push, all 3 variants (a-personal, b-pro, c-public) built in 1m22s — 2026-04-07
+- [x] **S0-11.** Created `t3rm1nu55-ane-research` repo with README/LICENSE/journal/references/experiments/findings structure → https://github.com/t3rm1nu55/t3rm1nu55-ane-research — 2026-04-07
+- [x] **S0-12.** Seeded `references.md` from the 2026-04-06 research synthesis (dougallj, hollance, Asahi, macmon, MIT CSAIL AMX thesis, arXiv Apple Silicon HPC study, bugsiki PMU analysis, maderix ANE deep dive, ibireme kperf gist, LKML Asahi patchset) — 2026-04-07
+- [x] **S0-13.** Daily RemoteTrigger Sonnet agent created — `trig_01Y9dDS9RQNS9B9T7RfvRAUC` — cron `17 6 * * *` UTC (07:17 Europe/London BST) — 2026-04-07
+- [ ] **S0-14.** Verify RemoteTrigger fires and produces expected output. Next scheduled fire: 2026-04-07T06:18Z. Check `claude.ai/code/scheduled/trig_01Y9dDS9RQNS9B9T7RfvRAUC` after that time. Look for: session completion, any branch `claude/sweep-2026-04-07` in t3rm1nu55-ane-research (if findings), or a "No new findings" session message. ← *pending natural fire*
 
 ### Definition of done
 - `cargo build --workspace` succeeds for all three variants on macos-latest CI
@@ -181,6 +181,12 @@
 - **2026-04-06.** Use the `iSMC` HID sensor hub approach for SMC reads, NOT the legacy Rust `smc` crate. *Rationale: sensors moved to a HID sensor hub on M-series Macs; the legacy crate may return no data or wrong data on Apple Silicon.*
 
 - **2026-04-06.** TSDB stack: Gorilla encoding (delta-of-delta + XOR floats) on top of `redb`, with a separate in-memory Last Value Cache for snapshot queries. *Rationale: Gorilla is the proven baseline for monitoring data (10× compression, ~51% of samples to 1 bit when stable); redb is pure-Rust with no system deps, ACID, and outperforms LMDB on individual writes; LVC pattern from InfluxDB 3 keeps MCP snapshot queries off the disk.*
+
+- **2026-04-07.** Cargo features: single-definition on `t3rm-core` (public `tier1/tier2/tier3/research` + private `__kperf/__es` module gates); binary crates mirror the tier features and forward to `t3rm-core/tierN`. `t3rm-tsdb` declares no-op tier features for uniform CI matrix invocation. *Rationale: alternative was a root meta-crate that collects bin features via a lib dep, but that breaks workspace separation. Per-crate forwarding is messier on the CI loop but keeps the workspace honest — each crate's Cargo.toml tells the truth about what it's gated by.*
+
+- **2026-04-07.** Research repo branch policy: scheduled agent pushes to `claude/sweep-YYYY-MM-DD` branches and opens PRs rather than pushing directly to `main`. *Rationale: GitHub default for cloud scheduled tasks restricts pushes to `claude/`-prefixed branches as a safety rail. Rather than override it, we lean into it — the user gets a review checkpoint for every sweep, and no-findings days skip the commit entirely to avoid repo churn.*
+
+- **2026-04-07.** Scheduled-task schedule: `17 6 * * *` UTC = 07:17 Europe/London (BST). *Rationale: off the :00 and :30 marks to avoid fleet-wide cron spikes (per Anthropic scheduling guidance). Morning local time so findings land before the user starts their day.*
 
 ---
 
